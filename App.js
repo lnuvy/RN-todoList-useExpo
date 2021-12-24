@@ -1,18 +1,36 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Pressable, TextInput } from 'react-native';
 import { theme } from "./colors";
 
 export default function App() {
+
+  const [working, setWorking] = useState(true);
+  const [text, setText] = useState("");
+  const travel = () => setWorking(false);
+  const work = () => setWorking(true);
+  const onChangeText = (payload) => setText(payload);
+
   return (
     <View style={styles.container}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.btnText}>Work</Text>
+        <TouchableOpacity onPress={work}>
+          <Text style={{ ...styles.btnText, color: working ? "white" : theme.grey }}>Work</Text>
         </TouchableOpacity>
-        <Text style={styles.btnText}>Travel</Text>
+        <TouchableOpacity onPress={travel}>
+          <Text style={{ ...styles.btnText, color: !working ? "white" : theme.grey }}>Travel</Text>
+        </TouchableOpacity>
       </View>
-      <StatusBar style="auto" />
+      <View>
+        <TextInput
+          multiline
+          onChangeText={onChangeText}
+          value={text}
+          // returnKeyType='send'
+          style={styles.input} placeholder={working ? "Add a Todo" : "Where do you want to go?"} />
+      </View>
+      <StatusBar style="light" />
     </View>
   );
 }
@@ -29,8 +47,16 @@ const styles = StyleSheet.create({
     marginTop: 100,
   },
   btnText: {
-    color: theme.grey,
+    // color: theme.grey,
     fontWeight: "600",
     fontSize: 40,
-  }
+  },
+  input: {
+    backgroundColor: "white",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginTop: 20,
+    fontSize: 15,
+  },
 });
