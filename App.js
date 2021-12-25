@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Pressable, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Pressable, TextInput, ScrollView } from 'react-native';
 import { theme } from "./colors";
 
 export default function App() {
@@ -15,9 +15,14 @@ export default function App() {
     if (text === "") {
       return;
     }
-    const newTodos = Object.assign({}, todos, {
-      [Date.now()]: { text, work: working },
-    });
+    // assign() 방법
+    // const newTodos = Object.assign({}, todos, {
+    //   [Date.now()]: { text, work: working },
+    // });
+
+    // ES6 방법
+    const newTodos = { ...todos, [Date.now()]: { text, working }, };
+
     setTodos(newTodos);
     setText("");
   };
@@ -42,7 +47,18 @@ export default function App() {
           returnKeyType='done'
           value={text}
           // returnKeyType='send'
-          style={styles.input} placeholder={working ? "Add a Todo" : "Where do you want to go?"} />
+          style={styles.input} placeholder={working ? "Add a Todo" : "Where do you want to go?"}
+        />
+        <ScrollView>{Object.keys(todos).map((key) => {
+          return (
+            todos[key].working === working ? (
+              <View style={styles.todo} key={key}>
+                <Text style={styles.todoText}>{todos[key].text}</Text>
+              </View>
+            ) : null
+          )
+        })}
+        </ScrollView>
       </View>
       <StatusBar style="light" />
     </View>
@@ -70,7 +86,19 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 20,
-    marginTop: 20,
+    marginVertical: 20,
     fontSize: 15,
+  },
+  todo: {
+    backgroundColor: theme.grey,
+    marginBottom: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+  },
+  todoText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
