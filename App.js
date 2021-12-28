@@ -1,11 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Pressable, TextInput, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Pressable, TextInput, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Fontisto } from '@expo/vector-icons';
 import { theme } from "./colors";
 
 
-const STORAGE_KEY = "@tods"
+const STORAGE_KEY = "@todoaass"
 
 export default function App() {
 
@@ -27,6 +28,12 @@ export default function App() {
   }
   const loadTodos = async () => {
     const str = await AsyncStorage.getItem(STORAGE_KEY)
+
+    // 저장소 key 변경했을때 에러 방지 (str 값이 null일때)
+    if (!str) {
+      return;
+    }
+
     setTodos(JSON.parse(str));
   }
 
@@ -51,11 +58,21 @@ export default function App() {
     await saveTodos(newTodos);
     setText("");
   };
+
   const deleteTodo = async (key) => {
-    const newTodos = { ...todos }
-    delete newTodos[key]
-    setTodos(newTodos);
-    await saveTodos(newTodos);
+    Alert.alert("Delete Todo?", "Are you sure?", [
+      { text: "Cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          const newTodos = { ...todos }
+          delete newTodos[key]
+          setTodos(newTodos);
+          await saveTodos(newTodos);
+        }
+      },
+    ]);
   }
 
   return (
@@ -84,6 +101,9 @@ export default function App() {
             todos[key].working === working ? (
               <View style={styles.todo} key={key}>
                 <Text style={styles.todoText}>{todos[key].text}</Text>
+                <TouchableOpacity onPress={() => { deleteTodo(key) }}>
+                  <Fontisto name="trash" size={16} color={theme.todoBg} />
+                </TouchableOpacity>
               </View>
             ) : null
           )
@@ -125,6 +145,9 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   todoText: {
     color: "white",
