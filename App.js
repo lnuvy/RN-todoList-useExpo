@@ -51,7 +51,12 @@ export default function App() {
     await saveTodos(newTodos);
     setText("");
   };
-  // console.log(todos);
+  const deleteTodo = async (key) => {
+    const newTodos = { ...todos }
+    delete newTodos[key]
+    setTodos(newTodos);
+    await saveTodos(newTodos);
+  }
 
   return (
     <View style={styles.container}>
