@@ -1,7 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, Pressable, TextInput, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from "./colors";
+
+
+const STORAGE_KEY = "@tods"
 
 export default function App() {
 
@@ -11,7 +15,27 @@ export default function App() {
   const travel = () => setWorking(false);
   const work = () => setWorking(true);
   const onChangeText = (payload) => setText(payload);
-  const addTodo = () => {
+
+  const saveTodos = async (toSave) => {
+    try {
+      const str = JSON.stringify(toSave)
+      await AsyncStorage.setItem(STORAGE_KEY, str)
+    } catch (e) {
+      console.log(`failed to Save!! ${e}`);
+    }
+
+  }
+  const loadTodos = async () => {
+    const str = await AsyncStorage.getItem(STORAGE_KEY)
+    setTodos(JSON.parse(str));
+  }
+
+  // componentDidMount 
+  useEffect(() => {
+    loadTodos()
+  }, [])
+
+  const addTodo = async () => {
     if (text === "") {
       return;
     }
@@ -24,9 +48,10 @@ export default function App() {
     const newTodos = { ...todos, [Date.now()]: { text, working }, };
 
     setTodos(newTodos);
+    await saveTodos(newTodos);
     setText("");
   };
-  console.log(todos);
+  // console.log(todos);
 
   return (
     <View style={styles.container}>
